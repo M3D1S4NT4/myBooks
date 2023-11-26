@@ -329,7 +329,7 @@ fun Registrarse(navController: NavHostController, usersRepository: UsersReposito
 
             val context = LocalContext.current
 
-            val totalUsers = viewModel.getTotalUsers();
+            //val totalUsers = viewModel.getTotalUsers();
 
             Button(
                 onClick = {
@@ -338,7 +338,7 @@ fun Registrarse(navController: NavHostController, usersRepository: UsersReposito
                     } else if (password != confirmPassword) {
                         navController.navigate("register")
                     } else {
-                        viewModel.insertUser(totalUsers, username, password)
+                        viewModel.insertUser(6, username, password)
                         navController.navigate("main")
                     }
                 },

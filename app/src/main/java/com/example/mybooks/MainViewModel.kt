@@ -22,8 +22,10 @@ class MainViewModel(private val usersRepository: UsersRepository) : ViewModel() 
         }
     }
 
-    fun getTotalUsers(): Int {
-        return usersRepository.getTotalUsersStream()
+    fun getTotalUsers() {
+        viewModelScope.launch {
+            usersRepository.getTotalUsers()
+        }
     }
 
     fun getUser(username: String) {

@@ -33,6 +33,11 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.mybooks.data.AppDataContainer
 import com.example.mybooks.data.User
 import com.example.mybooks.data.UsersRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -329,17 +334,32 @@ fun Registrarse(navController: NavHostController, usersRepository: UsersReposito
 
             val context = LocalContext.current
 
-            //val totalUsers = viewModel.getTotalUsers();
+            val totalUsers = usersRepository.getTotalUsers()
+
+            suspend fun registerUser() {
+                var cont = 0
+                totalUsers.collect {
+                    val initialTotal = it+1
+                    if (cont < 1) {
+                        cont = 1
+                        viewModel.insertUser(it+1, username, password)
+                    } else {
+                        navController.navigate("main")
+                    }
+                }
+            }
 
             Button(
                 onClick = {
+                    val scope = CoroutineScope(Dispatchers.Main) // Use Main dispatcher
                     if (email.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                         navController.navigate("register")
                     } else if (password != confirmPassword) {
                         navController.navigate("register")
                     } else {
-                        viewModel.insertUser(6, username, password)
-                        navController.navigate("main")
+                        scope.launch {
+                            registerUser()
+                        }
                     }
                 },
                 modifier = Modifier
@@ -359,7 +379,7 @@ fun Registrarse(navController: NavHostController, usersRepository: UsersReposito
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Principal(
-    /*userList: List<User>, onUserClick: (Int) -> Unit, modifier: Modifier = Modifier*/
+    /*userList: List<User>, onUserClick: Unit, modifier: Modifier = Modifier*/
 ) {
     val navyBlue = Color(0xFF001F3F)
 
@@ -380,7 +400,7 @@ fun Principal(
 
             /*UsersList(
                 userList = userList,
-                onUserClick = { onUserClick(it.id) },
+                onUserClick = {},
                 modifier = modifier
             )*/
 
@@ -445,46 +465,5 @@ fun Header(){
                 .size(50.dp)
                 .align(Alignment.Center)
         )
-    }
-}
-
-@Composable
-private fun UsersList(
-    userList: List<User>, onUserClick: (User) -> Unit, modifier: Modifier = Modifier
-) {
-    LazyColumn(modifier = modifier) {
-        items(items = userList, key = { it.id }) { user ->
-            userItem(user = user,
-                modifier = Modifier
-                    .clickable { onUserClick(user) })
-        }
-    }
-}
-
-@Composable
-private fun userItem(
-    user: User, modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier, elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = user.username,
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Spacer(Modifier.fillMaxWidth())
-                Text(
-                    text = user.password,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-        }
     }
 }

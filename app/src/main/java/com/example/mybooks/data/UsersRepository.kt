@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 interface UsersRepository {
     fun getAllUsersStream(): Flow<List<User>>
 
-    fun getTotalUsersStream(): Int
+    fun getTotalUsers(): Flow<Int>
 
     fun getUserStream(username: String): Flow<User>
 

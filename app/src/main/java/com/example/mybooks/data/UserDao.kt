@@ -13,8 +13,8 @@ interface UserDao {
     @Query("SELECT * from user_table ORDER BY username ASC")
     fun getAllUsers(): Flow<List<User>>
 
-    @Query("SELECT COUNT(*) FROM user_table")
-    fun getTotalUsers(): Int
+    @Query("SELECT MAX(id) AS max_id FROM user_table")
+    fun getTotalUsers(): Flow<Int>
 
     @Query("SELECT * from user_table WHERE username = :username")
     fun getUser(username: String): Flow<User>

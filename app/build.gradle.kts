@@ -77,4 +77,8 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.0")
     implementation("androidx.room:room-ktx:2.3.0")
     testImplementation("junit:junit:4.12")
+
+    implementation("androidx.camera:camera-core:1.1.0")
+    implementation("androidx.camera:camera-camera2:1.1.0")
+    implementation("androidx.camera:camera-lifecycle:1.1.0")
 }

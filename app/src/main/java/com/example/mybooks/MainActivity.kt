@@ -215,14 +215,29 @@ fun IniciarSesion(navController: NavHostController, usersRepository: UsersReposi
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            suspend fun loginUser(usern: String, passw: String) {
+                val user = usersRepository.getUserStream(usern)
+                user.collect { user ->
+                    if (user != null) {
+                        val username = user.username
+                        val password = user.password
+                        if (usern == username && passw == password) {
+                            navController.navigate("main")
+                        }
+                    }
+                }
+            }
+
             // Botón de inicio de sesión
             Button(
                 onClick = {
-                    val user = viewModel.getUser(username)
+                    val scope = CoroutineScope(Dispatchers.Main)
                     if (username.isEmpty() || password.isEmpty()) {
                         navController.navigate("login")
-                    } else if (user.equals(username)) {
-                        navController.navigate("main")
+                    } else {
+                        scope.launch {
+                            loginUser(username, password)
+                        }
                     }
                 },
                 modifier = Modifier
@@ -339,7 +354,6 @@ fun Registrarse(navController: NavHostController, usersRepository: UsersReposito
             suspend fun registerUser() {
                 var cont = 0
                 totalUsers.collect {
-                    val initialTotal = it+1
                     if (cont < 1) {
                         cont = 1
                         viewModel.insertUser(it+1, username, password)
@@ -378,9 +392,7 @@ fun Registrarse(navController: NavHostController, usersRepository: UsersReposito
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Principal(
-    /*userList: List<User>, onUserClick: Unit, modifier: Modifier = Modifier*/
-) {
+fun Principal() {
     val navyBlue = Color(0xFF001F3F)
 
     Box(
